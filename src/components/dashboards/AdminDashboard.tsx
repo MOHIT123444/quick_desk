@@ -7,6 +7,7 @@ import { CategoryManager } from '@/components/admin/CategoryManager';
 import { UserManager } from '@/components/admin/UserManager';
 import { supabase } from '@/integrations/supabase/client';
 
+// add all the details for admin 
 interface AdminStats {
   total_tickets: number;
   open_tickets: number;

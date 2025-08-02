@@ -5,10 +5,16 @@
   "tsx": true,
   "tailwind": {
     "config": "tailwind.config.ts",
+
+    // "prefix": "tw-",
+    "variants": ["responsive", "responsive", "responsive", "responsive", "responsive"],
     "css": "src/index.css",
     "baseColor": "slate",
     "cssVariables": true,
+    "darkMode": "class", // darkmode 
     "prefix": ""
+
+
   },
   "aliases": {
     "components": "@/components",

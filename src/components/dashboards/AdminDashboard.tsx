@@ -1,13 +1,22 @@
+// React imports for state and effect hooks
 import { useState, useEffect } from 'react';
+
+// UI components from your design system
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Icon components for dashboard visuals
 import { Ticket, Clock, CheckCircle, Users, Tag, Shield } from 'lucide-react';
+
+// Custom components for ticket listing and admin management
 import { TicketList } from '@/components/tickets/TicketList';
 import { CategoryManager } from '@/components/admin/CategoryManager';
 import { UserManager } from '@/components/admin/UserManager';
+
+// Supabase client for backend data
 import { supabase } from '@/integrations/supabase/client';
 
-// add all the details for admin 
+// Interface to type-check admin statistics structure
 interface AdminStats {
   total_tickets: number;
   open_tickets: number;
@@ -17,7 +26,9 @@ interface AdminStats {
   total_categories: number;
 }
 
+// Main admin dashboard component
 export const AdminDashboard = () => {
+  // State to hold various admin statistics
   const [stats, setStats] = useState<AdminStats>({
     total_tickets: 0,
     open_tickets: 0,
@@ -26,35 +37,40 @@ export const AdminDashboard = () => {
     total_users: 0,
     total_categories: 0
   });
+
+  // State to force refresh of dashboard data
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Trigger data fetch on component mount or when refreshKey changes
   useEffect(() => {
     fetchStats();
   }, [refreshKey]);
 
+  // Function to fetch data from Supabase and update stats
   const fetchStats = async () => {
     try {
-      // Get ticket stats
+      // Fetch all ticket statuses
       const { data: tickets, error: ticketsError } = await supabase
         .from('tickets')
         .select('status');
 
       if (ticketsError) throw ticketsError;
 
-      // Get user count
+      // Fetch all users
       const { data: users, error: usersError } = await supabase
         .from('profiles')
         .select('id');
 
       if (usersError) throw usersError;
 
-      // Get category count
+      // Fetch all categories
       const { data: categories, error: categoriesError } = await supabase
         .from('categories')
         .select('id');
 
       if (categoriesError) throw categoriesError;
 
+      // Build admin statistics object
       const stats: AdminStats = {
         total_tickets: tickets.length,
         open_tickets: tickets.filter(t => t.status === 'open').length,
@@ -64,6 +80,7 @@ export const AdminDashboard = () => {
         total_categories: categories.length
       };
 
+      // Update stats state
       setStats(stats);
     } catch (error) {
       console.error('Error fetching admin stats:', error);
@@ -72,6 +89,7 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header section */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
@@ -79,8 +97,9 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stat cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        {/* Total Tickets */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tickets</CardTitle>
@@ -91,6 +110,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Open Tickets */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Open</CardTitle>
@@ -101,6 +121,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* In Progress Tickets */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
@@ -111,6 +132,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Resolved Tickets */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Resolved</CardTitle>
@@ -121,6 +143,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Total Users */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -131,6 +154,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Total Categories */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Categories</CardTitle>
@@ -142,7 +166,7 @@ export const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Admin Tabs */}
+      {/* Tabs for system management sections */}
       <Card>
         <CardHeader>
           <CardTitle>System Management</CardTitle>
@@ -150,21 +174,27 @@ export const AdminDashboard = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="tickets" className="w-full">
+            {/* Tabs list */}
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="tickets">All Tickets</TabsTrigger>
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
             
+            {/* Tickets tab */}
             <TabsContent value="tickets" className="space-y-4">
               <TicketList refreshKey={refreshKey} userRole="admin" />
             </TabsContent>
             
+            {/* Users tab */}
             <TabsContent value="users" className="space-y-4">
+              {/* RefreshKey is incremented to trigger data re-fetch in UserManager */}
               <UserManager onUserUpdated={() => setRefreshKey(prev => prev + 1)} />
             </TabsContent>
             
+            {/* Categories tab */}
             <TabsContent value="categories" className="space-y-4">
+              {/* RefreshKey is incremented to trigger data re-fetch in CategoryManager */}
               <CategoryManager onCategoryUpdated={() => setRefreshKey(prev => prev + 1)} />
             </TabsContent>
           </Tabs>

@@ -5,6 +5,10 @@ QuickDesk is a streamlined, role-based help desk ticketing system that allows us
 
 ---
 Deployment = [Link](https://preview--quick-desk-hub.lovable.app/auth)
+Credentials = admin ==> quick_desk_hub_admin@gmail.com || admin@123
+              agent ==> quick_desk_hub_agent@gmail.com || agent@123
+              user ==> quick_desk_hub_user@gmail.com   || user@123
+              
 ## 🚀 Features
 
 ### 👤 End Users (Customers/Employees)

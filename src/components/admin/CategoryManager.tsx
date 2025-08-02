@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -48,8 +49,9 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     color: '#3B82F6'
   });
 
+  // const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   useEffect(() => {
-    fetchCategories();
+    fetchCategories(); 
   }, []);
 
   const fetchCategories = async () => {

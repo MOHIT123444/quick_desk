@@ -1,3 +1,4 @@
+// Import necessary hooks, components, and icons
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +25,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
+// Define Ticket and Comment interfaces to type the props and state
 interface Ticket {
   id: string;
   title: string;
@@ -49,6 +51,7 @@ interface Comment {
   user: { full_name: string | null; username: string | null; role: string } | null;
 }
 
+// Props for TicketDetailDialog component
 interface TicketDetailDialogProps {
   ticket: Ticket;
   open: boolean;
@@ -57,6 +60,7 @@ interface TicketDetailDialogProps {
   onTicketUpdated: () => void;
 }
 
+// Main dialog component for viewing and managing a support ticket
 export const TicketDetailDialog = ({ 
   ticket, 
   open, 
@@ -72,6 +76,7 @@ export const TicketDetailDialog = ({
   const [loading, setLoading] = useState(false);
   const [agents, setAgents] = useState<any[]>([]);
 
+  // Fetch comments and agent list when dialog opens
   useEffect(() => {
     if (open) {
       fetchComments();
@@ -81,6 +86,7 @@ export const TicketDetailDialog = ({
     }
   }, [open, ticket.id]);
 
+  // Retrieve ticket comments from Supabase
   const fetchComments = async () => {
     try {
       const { data, error } = await supabase
@@ -99,6 +105,7 @@ export const TicketDetailDialog = ({
     }
   };
 
+  // Retrieve list of agents and admins
   const fetchAgents = async () => {
     try {
       const { data, error } = await supabase
@@ -113,6 +120,7 @@ export const TicketDetailDialog = ({
     }
   };
 
+  // Handle comment submission
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newComment.trim()) return;
@@ -131,8 +139,8 @@ export const TicketDetailDialog = ({
       if (error) throw error;
 
       setNewComment('');
-      await fetchComments();
-      
+      await fetchComments(); // Refresh comments
+
       toast({
         title: 'Comment Added',
         description: 'Your comment has been added successfully.'
@@ -148,6 +156,7 @@ export const TicketDetailDialog = ({
     }
   };
 
+  // Handle status updates
   const handleStatusUpdate = async () => {
     if (!user || newStatus === ticket.status) return;
 
@@ -165,7 +174,7 @@ export const TicketDetailDialog = ({
         description: `Ticket status changed to ${newStatus.replace('_', ' ')}`
       });
 
-      onTicketUpdated();
+      onTicketUpdated(); // Refresh ticket state
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -177,6 +186,7 @@ export const TicketDetailDialog = ({
     }
   };
 
+  // Handle agent assignment
   const handleAssignTicket = async (agentId: string) => {
     if (!user) return;
 
@@ -194,7 +204,7 @@ export const TicketDetailDialog = ({
         description: agentId ? 'Ticket assigned successfully' : 'Ticket unassigned'
       });
 
-      onTicketUpdated();
+      onTicketUpdated(); // Refresh ticket state
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -206,6 +216,7 @@ export const TicketDetailDialog = ({
     }
   };
 
+  // Format timestamps into a readable format
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -216,12 +227,14 @@ export const TicketDetailDialog = ({
     });
   };
 
+  // Determine whether the user can update ticket details
   const canManageTicket = userRole === 'admin' || 
     (userRole === 'agent' && (ticket.assigned_to === user?.id || !ticket.assigned_to));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        {/* Dialog header section */}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span>{ticket.title}</span>
@@ -233,9 +246,9 @@ export const TicketDetailDialog = ({
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
+          {/* Main ticket details and comments */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Ticket Details */}
+            {/* Ticket description card */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Description</CardTitle>
@@ -245,7 +258,7 @@ export const TicketDetailDialog = ({
               </CardContent>
             </Card>
 
-            {/* Comments */}
+            {/* Comments section */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -254,6 +267,7 @@ export const TicketDetailDialog = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Existing comments */}
                 {comments.length === 0 ? (
                   <p className="text-muted-foreground text-center py-4">No comments yet.</p>
                 ) : (
@@ -282,7 +296,7 @@ export const TicketDetailDialog = ({
                   ))
                 )}
 
-                {/* Add Comment Form */}
+                {/* Add comment form */}
                 <form onSubmit={handleAddComment} className="space-y-3">
                   <div>
                     <Label htmlFor="comment">Add a comment</Label>
@@ -302,14 +316,15 @@ export const TicketDetailDialog = ({
             </Card>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar with ticket metadata and actions */}
           <div className="space-y-4">
-            {/* Ticket Info */}
+            {/* Ticket info */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Ticket Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Status badge */}
                 <div>
                   <Label className="text-sm font-medium">Status</Label>
                   <div className="mt-1">
@@ -324,6 +339,7 @@ export const TicketDetailDialog = ({
                   </div>
                 </div>
 
+                {/* Priority display */}
                 <div>
                   <Label className="text-sm font-medium">Priority</Label>
                   <div className="mt-1">
@@ -331,6 +347,7 @@ export const TicketDetailDialog = ({
                   </div>
                 </div>
 
+                {/* Category */}
                 {ticket.categories && (
                   <div>
                     <Label className="text-sm font-medium">Category</Label>
@@ -343,6 +360,7 @@ export const TicketDetailDialog = ({
                   </div>
                 )}
 
+                {/* Creation date */}
                 <div>
                   <Label className="text-sm font-medium">Created</Label>
                   <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
@@ -351,6 +369,7 @@ export const TicketDetailDialog = ({
                   </div>
                 </div>
 
+                {/* Last updated */}
                 <div>
                   <Label className="text-sm font-medium">Last Updated</Label>
                   <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
@@ -359,6 +378,7 @@ export const TicketDetailDialog = ({
                   </div>
                 </div>
 
+                {/* Assignee */}
                 {ticket.assignee && (
                   <div>
                     <Label className="text-sm font-medium">Assigned To</Label>
@@ -371,13 +391,14 @@ export const TicketDetailDialog = ({
               </CardContent>
             </Card>
 
-            {/* Actions */}
+            {/* Management actions (status update, assignment) */}
             {canManageTicket && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Status change dropdown */}
                   <div>
                     <Label htmlFor="status">Update Status</Label>
                     <div className="flex gap-2 mt-1">
@@ -402,6 +423,7 @@ export const TicketDetailDialog = ({
                     </div>
                   </div>
 
+                  {/* Agent assignment dropdown */}
                   {(userRole === 'agent' || userRole === 'admin') && (
                     <div>
                       <Label htmlFor="assign">Assign To</Label>

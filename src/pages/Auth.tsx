@@ -14,6 +14,10 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   // Redirect if already authenticated
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
   
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {

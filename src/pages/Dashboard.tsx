@@ -42,7 +42,8 @@ const Dashboard = () => {
       default:
         return <UserDashboard />;
     }
-  };
+  }
+  // render the dashboard 
 
   return (
     <Layout>

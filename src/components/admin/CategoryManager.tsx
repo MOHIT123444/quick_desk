@@ -1,3 +1,4 @@
+// Importing required hooks, components, and icons
 import { useState, useEffect } from 'react';   
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,7 @@ import { Plus, Edit, Trash2, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// Define the Category interface
 interface Category {
   id: string;
   name: string;
@@ -33,12 +35,16 @@ interface Category {
   created_at: string;
 }
 
+// Props for the CategoryManager component
 interface CategoryManagerProps {
   onCategoryUpdated: () => void;
 }
 
+// Main Category Manager Component
 export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => {
   const { toast } = useToast();
+
+  // Local state for categories, form, and UI control
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
@@ -49,11 +55,12 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     color: '#3B82F6'
   });
 
-  // const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  // Fetch categories when component mounts
   useEffect(() => {
     fetchCategories(); 
   }, []);
 
+  // Fetch categories from Supabase
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
@@ -70,6 +77,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     }
   };
 
+  // Submit handler for form (create or update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -89,7 +97,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
           description: 'The category has been updated successfully.'
         });
       } else {
-        // Create new category
+        // Insert new category
         const { error } = await supabase
           .from('categories')
           .insert(formData);
@@ -102,6 +110,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
         });
       }
 
+      // Reset state and refresh categories
       setShowDialog(false);
       setEditingCategory(null);
       setFormData({ name: '', description: '', color: '#3B82F6' });
@@ -118,6 +127,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     }
   };
 
+  // Set editing state and open dialog
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
     setFormData({
@@ -128,6 +138,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     setShowDialog(true);
   };
 
+  // Delete a category after confirmation
   const handleDelete = async (categoryId: string) => {
     if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
       return;
@@ -160,18 +171,21 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
     }
   };
 
+  // Reset form and open create dialog
   const openCreateDialog = () => {
     setEditingCategory(null);
     setFormData({ name: '', description: '', color: '#3B82F6' });
     setShowDialog(true);
   };
 
+  // Loading state if categories are still being fetched
   if (loading && categories.length === 0) {
     return <div className="text-center py-4">Loading categories...</div>;
   }
 
   return (
     <div className="space-y-4">
+      {/* Header with title and add button */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">Category Management</h3>
@@ -185,6 +199,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
         </Button>
       </div>
 
+      {/* Table listing all categories */}
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -198,6 +213,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
               </TableRow>
             </TableHeader>
             <TableBody>
+              {/* Show message if no categories */}
               {categories.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
@@ -205,10 +221,12 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
                   </TableCell>
                 </TableRow>
               ) : (
+                // Map through categories
                 categories.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
+                        {/* Color dot + category name */}
                         <div 
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: category.color }}
@@ -222,6 +240,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
                       </span>
                     </TableCell>
                     <TableCell>
+                      {/* Color badge */}
                       <Badge 
                         variant="outline" 
                         style={{ borderColor: category.color, color: category.color }}
@@ -231,9 +250,11 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      {/* Format creation date */}
                       {new Date(category.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
+                      {/* Edit and Delete buttons */}
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -260,7 +281,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
         </CardContent>
       </Card>
 
-      {/* Create/Edit Dialog */}
+      {/* Dialog for creating or editing category */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
@@ -275,6 +296,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
             </DialogDescription>
           </DialogHeader>
 
+          {/* Category form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -301,6 +323,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
             <div className="space-y-2">
               <Label htmlFor="color">Color</Label>
               <div className="flex items-center gap-2">
+                {/* Color picker */}
                 <Input
                   id="color"
                   type="color"
@@ -308,6 +331,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                   className="w-16 h-10 p-1 rounded"
                 />
+                {/* Hex code input */}
                 <Input
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
@@ -317,6 +341,7 @@ export const CategoryManager = ({ onCategoryUpdated }: CategoryManagerProps) => 
               </div>
             </div>
 
+            {/* Form buttons */}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancel

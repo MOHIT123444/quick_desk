@@ -33,7 +33,16 @@ const Dashboard = () => {
     );
   }
 
-  
+  const renderDashboard = () => {
+    switch (profile.role) {
+      case 'admin':
+        return <AdminDashboard />;
+      case 'agent':
+        return <AgentDashboard />;
+      default:
+        return <UserDashboard />;
+    }
+  };
 
   return (
     <Layout>

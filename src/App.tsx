@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+// used type script
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

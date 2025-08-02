@@ -4,7 +4,9 @@
 QuickDesk is a streamlined, role-based help desk ticketing system that allows users to raise support tickets, track progress, and receive timely resolutions by support agents. Built with **React**, **Supabase**, and **TailwindCSS**, this project is designed for scalability, responsiveness, and real-time collaboration.
 
 ---
+
 Deployment = [Link](https://preview--quick-desk-hub.lovable.app/auth)
+
 Credentials = admin ==> quick_desk_hub_admin@gmail.com || admin@123
               agent ==> quick_desk_hub_agent@gmail.com || agent@123
               user ==> quick_desk_hub_user@gmail.com   || user@123
